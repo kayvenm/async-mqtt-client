@@ -10,6 +10,9 @@
 #include <freertos/semphr.h>
 #elif defined(ESP8266)
 #include <ESPAsyncTCP.h>
+#elif defined(LIBRETUYA)
+#include <AsyncTCP.h>
+#include <semphr.h>
 #else
 #error Platform not supported
 #endif
@@ -38,7 +41,7 @@
 #include "AsyncMqttClient/Packets/PubRecPacket.hpp"
 #include "AsyncMqttClient/Packets/PubCompPacket.hpp"
 
-#if ESP32
+#if ESP32 || defined(LIBRETUYA)
 #define SEMAPHORE_TAKE(X) if (xSemaphoreTake(_xSemaphore, 1000 / portTICK_PERIOD_MS) != pdTRUE) { return X; }  // Waits max 1000ms
 #define SEMAPHORE_GIVE() xSemaphoreGive(_xSemaphore);
 #elif defined(ESP8266)
@@ -132,7 +135,7 @@ class AsyncMqttClient {
 
   std::vector<AsyncMqttClientInternals::PendingAck> _toSendAcks;
 
-#ifdef ESP32
+#if defined(ESP32) || defined(LIBRETUYA)
   SemaphoreHandle_t _xSemaphore = nullptr;
 #endif
 
